@@ -9,16 +9,16 @@ lance, a simple version of the vulnerability detection framework based on Python
 
 ## screenshot
 
-![screen shot for lance](./docs/screenshot1.png)
+![screen shot for lance](./docs/screenshot2.png)
 
 ## requirements
 
-python3
+python
 
 
 ## usage
 
-please run `python3 lance.py -h` for help.
+please run `python lance.py -h` for help.
 
 ```shell
 root@kali:~/lance# python3 lance.py 

