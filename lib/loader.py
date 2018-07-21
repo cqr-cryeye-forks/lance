@@ -25,31 +25,17 @@ def loadPlugin(url, poc=None):
     
     items = os.listdir(plugin_path)
     if poc:
-        logger.info("Loading %s plugins." % poc)
-        for item in items:
-            if item.endswith(".py") and not item.startswith('__'):
-                plugin_name = item[:-3]
-                if poc in plugin_name:
-                    logger.info("Loading plugin: %s" % plugin_name)
-
-                    module = importlib.import_module("plugins." + plugin_name)
-
-                    try:
-                        result = module.run(url)
-                        if result:
-                            logger.success(result)
-                        else:
-                            logger.error("Not Vulnerable %s " % plugin_name)
-                    except:
-                        logger.warning("ConnectionError ")
-                else:
-                    continue
+        logger.infxito("Loading %s plugins." % poc)
     else:
-        for item in items:
-            if item.endswith(".py") and not item.startswith('__'):
-                plugin_name = item[:-3]
+        poc=""
+    for item in items:
+        if item.endswith(".py") and not item.startswith('__'):
+            plugin_name = item[:-3]
+            if poc in plugin_name:
                 logger.info("Loading plugin: %s" % plugin_name)
+
                 module = importlib.import_module("plugins." + plugin_name)
+
                 try:
                     result = module.run(url)
                     if result:
@@ -58,5 +44,7 @@ def loadPlugin(url, poc=None):
                         logger.error("Not Vulnerable %s " % plugin_name)
                 except:
                     logger.warning("ConnectionError ")
+            else:
+                continue
 
     logger.info("Finished")
