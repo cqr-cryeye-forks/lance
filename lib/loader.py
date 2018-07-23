@@ -25,7 +25,7 @@ def loadPlugin(url, poc=None):
     
     items = os.listdir(plugin_path)
     if poc:
-        logger.infxito("Loading %s plugins." % poc)
+        logger.info('Loading plugins with "%s" key words.' % poc)
     else:
         poc=""
     for item in items:
