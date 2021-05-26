@@ -39,7 +39,7 @@ def run(url):
             </soapenv:Header>
         <soapenv:Body/>
         </soapenv:Envelope>"""
-    req = requests.post(url, headers=headers, data=xml, timeout=5)
+    req = requests.post(url, headers=headers, data=xml, timeout=5, verify=False)
     if req.status_code == 500:
         return "WebLogic XMLDecoder Vulnerable"
     else:

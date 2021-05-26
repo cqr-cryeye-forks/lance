@@ -9,7 +9,7 @@ import requests
 def run(url):
     """Docker Remote API unauth"""
     url = url + ":2375/info"
-    req = requests.get(url)
+    req = requests.get(url, verify=False)
     if "Containers" in req.text:
         print(req.text)
         return "Docker Remote API unauth Vulnerable"

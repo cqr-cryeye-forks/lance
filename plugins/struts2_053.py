@@ -18,7 +18,7 @@ def run(url):
         'redirectUri':payload
     }
 
-    req = requests.post(url=url, data=headers)
+    req = requests.post(url=url, data=headers, verify=False)
 
     if "root" in req.text:
         return "s2-053 Vulnerable"    

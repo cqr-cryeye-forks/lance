@@ -18,7 +18,7 @@ def run(url):
     for user in weak:
         for pwd in weak:
             data = {'Authorization':'Basic '+base64.b64encode((user+':'+pwd).encode()).decode()}
-            req = requests.get(url, headers=data, timeout=5)
+            req = requests.get(url, headers=data, timeout=5, verify=False)
 
             if not "Unauthorized" in req.text:
                 msg = 'ActiveMQ weak password!\t'+ url+'\tusername:{}, pwd:{}'.format(user, pwd)

