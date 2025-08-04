@@ -1,0 +1,5 @@
+*
+!lib/
+!plugins/
+!lance.py
+!requirements.txt
