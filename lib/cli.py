@@ -14,6 +14,9 @@ def main():
 
 	if args.target:
 		url = args.target
+	else:
+		raise Exception("No one target to scan")
+
 	if args.module:
 		plugin = args.module
 	else:
