@@ -1,26 +1,23 @@
-#!/usr/bin/env python
-# coding: utf-8
-# Date  : 2018-07-16 10:40:08
-# Author: b4zinga
-# Email : b4zinga@outlook.com
-# Func  :
+import json
 
 from lib.cmdline import cmdLineParser
-from lib.loader import loadPlugin
+from lib.constants import MAIN_DIR
+from lib.loader import load_plugin
 
 
 def main():
-	args = cmdLineParser()
+    args = cmdLineParser()
+    url = args.target
+    OUTPUT_JSON = MAIN_DIR / args.output
 
-	if args.target:
-		url = args.target
-	else:
-		raise Exception("No one target to scan")
+    if not url:
+        raise Exception("No one target to scan")
 
-	if args.module:
-		plugin = args.module
-	else:
-		plugin=None
+    results = load_plugin(url=url)
 
-		
-	loadPlugin(url=url, poc=plugin)
+    url_result = {
+        "target": url,
+        "results": results,
+    }
+    with OUTPUT_JSON.open('w') as jf:
+        json.dump(url_result, jf, indent=2)

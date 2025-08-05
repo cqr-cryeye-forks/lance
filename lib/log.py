@@ -1,12 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-# Date  : 2018-07-20 10:29:03
-# Author: b4zinga
-# Email : b4zinga@outlook.com
-# Func  :
-
 import sys
 import logging
+from lib.ansistrm import ColorizingStreamHandler
+
 
 class CustomLogging:
     SYSINFO = 9
@@ -22,33 +17,22 @@ logging.addLevelName(CustomLogging.WARNING, "!")
 
 LOGGER = logging.getLogger("lanceLog")
 
-LOGGER_HANDLER = None
-try:
-    from lib.ansistrm import ColorizingStreamHandler
 
-    disableColor = False
-
-    for argument in sys.argv:
-        if "disable-col" in argument:
-            disableColor = True
-            break
-
-    if disableColor:
-        LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
+def setup_logger(disable_color=False):
+    if disable_color:
+        handler = logging.StreamHandler(sys.stdout)
     else:
-        LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
-        LOGGER_HANDLER.level_map[logging.getLevelName("*")] = (None, "cyan", False)
-        LOGGER_HANDLER.level_map[logging.getLevelName("+")] = (None, "red", False)
-        LOGGER_HANDLER.level_map[logging.getLevelName("-")] = (None, "green", False)
-        LOGGER_HANDLER.level_map[logging.getLevelName("!")] = (None, "yellow", False)
-except ImportError as e:
-    LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
+        handler = ColorizingStreamHandler(sys.stdout)
+        handler.level_map[logging.getLevelName("*")] = (None, "cyan", False)
+        handler.level_map[logging.getLevelName("+")] = (None, "red", False)
+        handler.level_map[logging.getLevelName("-")] = (None, "green", False)
+        handler.level_map[logging.getLevelName("!")] = (None, "yellow", False)
 
-FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
-
-LOGGER_HANDLER.setFormatter(FORMATTER)
-LOGGER.addHandler(LOGGER_HANDLER)
-LOGGER.setLevel(CustomLogging.WARNING)
+    formatter = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
+    handler.setFormatter(formatter)
+    LOGGER.addHandler(handler)
+    LOGGER.setLevel(CustomLogging.WARNING)
+    return LOGGER
 
 
 class MyLogger:
@@ -66,4 +50,7 @@ class MyLogger:
 
     @staticmethod
     def error(msg):
-        return LOGGER.log(CustomLogging.ERROR, msg) 
+        return LOGGER.log(CustomLogging.ERROR, msg)
+
+
+logger = setup_logger(disable_color="--disable-col" in sys.argv)
