@@ -9,6 +9,10 @@ def cmdLineParser():
         help="target url.",
     )
     parser.add_argument(
+        "--port",
+        help="target port.",
+    )
+    parser.add_argument(
         "--output",
         help="output JSON file to save results.",
     )

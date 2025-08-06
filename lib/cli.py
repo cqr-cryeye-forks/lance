@@ -8,12 +8,14 @@ from lib.loader import load_plugin
 def main():
     args = cmdLineParser()
     url = args.target
+    port = args.port
     OUTPUT_JSON = MAIN_DIR / args.output
+
 
     if not url:
         raise Exception("No one target to scan")
 
-    results = load_plugin(url=url)
+    results = load_plugin(url=url, port=port)
 
     url_result = {
         "target": url,
