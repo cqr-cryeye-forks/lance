@@ -5,9 +5,9 @@ import requests
 from lib.log import logger
 
 
-def run(url: str) -> Optional[str]:
-    """Detect unauthorized Docker Remote API vulnerability."""
-    target_url = f"{url}:2375/info"
+def run(url: str, port: int) -> Optional[str]:
+    address = f"{url}:{port}"
+    target_url = f"{address}/info"
     try:
         logger.info(f"Checking Docker API at {target_url}")
         response = requests.get(target_url, verify=False, timeout=5)

